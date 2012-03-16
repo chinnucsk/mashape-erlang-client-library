@@ -11,10 +11,11 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/2,
-         request/3,
-         request/5,
-         request/6]).
+-export([start_link/3,
+         request/4,
+         request/6,
+         request/7,
+         stop/1]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -35,33 +36,30 @@
 %%% API
 %%%===================================================================
 
-%%--------------------------------------------------------------------
-%% @doc
-%% Starts the server
-%%
-%% @spec start_link() -> {ok, Pid} | ignore | {error, Error}
-%% @end
-%%--------------------------------------------------------------------
-start_link(PublicKey, PrivateKey) ->
-    gen_server:start_link({local, ?SERVER}, ?MODULE, [PublicKey, PrivateKey], []).
+-spec start_link(atom(), binary(), binary()) -> {ok, Pid::pid()} | ignore | {error, Error::any()}.
+start_link(Name, PublicKey, PrivateKey) ->
+    gen_server:start_link({local, Name}, ?MODULE, [PublicKey, PrivateKey], []).
 
 %%%===================================================================
 %%% gen_server callbacks
 %%%===================================================================
 
--spec request(Type :: http_method(), Url :: string(), Params :: query_params()) -> response().
-request(Type, Url, Params) ->
-    request(Type, Url, Params, true, true).
+-spec request(Name :: atom(), Type :: http_method(), Url :: string(), Params :: query_params()) -> response().
+request(Name, Type, Url, Params) ->
+    request(Name, Type, Url, Params, true, true).
 
--spec request(Type :: http_method(), Url :: string(), Params :: query_params(),
+-spec request(Name::atom(), Type :: http_method(), Url :: string(), Params :: query_params(),
               AddAuthHeaders :: boolean(), ParseJson :: boolean()) -> response().
-request(Type, Url, Params, AddAuthHeaders, ParseJson) ->
-    gen_server:call(?SERVER, {request, Type, Url, Params, AddAuthHeaders, ParseJson}).
+request(Name, Type, Url, Params, AddAuthHeaders, ParseJson) ->
+    gen_server:call(Name, {request, Type, Url, Params, AddAuthHeaders, ParseJson}).
     
--spec request(Type :: http_method(), Url :: string(), Params :: query_params(),
+-spec request(Name::atom(), Type :: http_method(), Url :: string(), Params :: query_params(),
               AddAuthHeaders :: boolean(),  Callback :: callback(), ParseJson :: boolean()) -> response().
-request(Type, Url, Params, AddAuthHeaders, Callback, ParseJson) ->
-    gen_server:cast(?SERVER, {request, Type, Url, Params, AddAuthHeaders, Callback, ParseJson}).
+request(Name, Type, Url, Params, AddAuthHeaders, Callback, ParseJson) ->
+    gen_server:cast(Name, {request, Type, Url, Params, AddAuthHeaders, Callback, ParseJson}).
+
+stop(Name) ->
+    gen_server:call(Name, stop).
 
 %%--------------------------------------------------------------------
 %% @private
@@ -97,7 +95,9 @@ handle_call({request, Type, Url, Params, AddAuthHeaders, ParseJson}, From,
                                 Reply = in_request(Type, Url, Params, PublicKey, PrivateKey, AddAuthHeaders, ParseJson),
                                 gen_server:reply(From, Reply)
                         end),
-    {noreply, State}.
+    {noreply, State};
+handle_call(stop, _From, State) -> 
+    {stop, "Normal stop.", State}.
 
 %%--------------------------------------------------------------------
 %% @private
