@@ -8,13 +8,13 @@
 -behaviour(supervisor).
 
 %% API
--export([start_link/0,
-         create/3]).
+-export([start_link/0]).
 
 %% Supervisor callbacks
 -export([init/1]).
 
 -define(SERVER, ?MODULE).
+                       
 
 %%%===================================================================
 %%% API functions
@@ -24,9 +24,6 @@
 start_link() ->
     supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
-create(Name, PublicKey, PrivateKey) ->
-    supervisor:start_child(?SERVER, [Name, PublicKey, PrivateKey]).
-
 %%%===================================================================
 %%% Supervisor callbacks
 %%%===================================================================
@@ -35,23 +32,31 @@ create(Name, PublicKey, PrivateKey) ->
 -spec init(list()) -> {ok, {SupFlags::any(), [ChildSpec::any()]}} |
                        ignore | {error, Reason::any()}.
 init([]) ->
-    RestartStrategy = simple_one_for_one,
-    MaxRestarts = 0,
-    MaxSecondsBetweenRestarts = 1,
+    RestartStrategy = one_for_one,
+    MaxRestarts = 3,
+    MaxSecondsBetweenRestarts = 60,
 
     SupFlags = {RestartStrategy, MaxRestarts, MaxSecondsBetweenRestarts},
 
-    Restart = temporary,
+    Restart = permanent,
     Shutdown = 2000,
     Type = worker,
 
-    AChild = {emashape, {emashape, start_link, []},
+    PublicKey = default(application:get_env(emashape, public_key), undefined),
+    PrivateKey = default(application:get_env(emashape, private_key), undefined),
+
+    AChild = {emashape, {emashape, start_link, [PublicKey, PrivateKey]},
               Restart, Shutdown, Type, [emashape]},
 
     {ok, {SupFlags, [AChild]}}.
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+default(undefined, Y) ->
+    {ok, Y};
+default(X, _Y) ->
+    X.
 
 %%%====================================================================
 %%% tests
