@@ -42,8 +42,8 @@ init([]) ->
     Shutdown = 2000,
     Type = worker,
 
-    PublicKey = default(application:get_env(emashape, public_key), undefined),
-    PrivateKey = default(application:get_env(emashape, private_key), undefined),
+    {ok, PublicKey} = default(application:get_env(emashape, public_key), undefined),
+    {ok, PrivateKey} = default(application:get_env(emashape, private_key), undefined),
 
     AChild = {emashape, {emashape, start_link, [PublicKey, PrivateKey]},
               Restart, Shutdown, Type, [emashape]},

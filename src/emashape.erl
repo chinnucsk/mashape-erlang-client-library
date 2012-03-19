@@ -193,7 +193,7 @@ request_(get, Url, Headers, Body=[_|_]) ->
     request_(get, Url++"?"++Body, Headers, []);
 request_(Type, Url, Headers, Body) ->
     Ssl = string:str(Url, "https") > 0 orelse string:str(Url, "443") > 0,
-    {ok, _StatusCode, _ResponseHeaders, ResultBody} = ibrowse:send_req(Url, Headers, Type, Body, [{is_ssl, Ssl}]),
+    {ok, _StatusCode, _ResponseHeaders, ResultBody} = ibrowse:send_req(Url, Headers, Type, Body, [{is_ssl, Ssl}, {ssl_options, []}]),
     ResultBody.
 
 auth_header(PublicKey, PrivateKey) ->
@@ -217,8 +217,12 @@ replace_qa_variables(Url, Params) ->
               end, Url, Params)).
 
 get_qs_params(Url) ->
-    [_, QS] = string:tokens(Url, "?"),
-    [{K, V} || [K, V] <- [string:tokens(KV, "=") || KV <- string:tokens(QS, "&")]].    
+    case string:tokens(Url, "?") of
+        [_, QS] ->
+            [{K, V} || [K, V] <- [string:tokens(KV, "=") || KV <- string:tokens(QS, "&")]];
+        [_] ->
+            []
+    end.
         
 %%%===================================================================
 %%% Tests
