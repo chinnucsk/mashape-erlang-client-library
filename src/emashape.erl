@@ -28,7 +28,7 @@
 -record(state, {public_key, private_key}).
 
 -type http_method() :: get | put | post | delete.
--type callback() :: function() | pid().
+-type callback() :: function() | pid() | undefined.
 -type query_params() :: [{string(), string()}].
 -type response() :: list() | binary().
 
@@ -59,6 +59,8 @@ request(Type, Url, Params, AddAuthHeaders, ParseJson) ->
     
 -spec request(Type :: http_method(), Url :: string(), Params :: query_params(),
               AddAuthHeaders :: boolean(),  Callback :: callback(), ParseJson :: boolean()) -> response().
+request(Type, Url, Params, AddAuthHeaders, undefined, ParseJson) ->
+    gen_server:call(?SERVER, {request, Type, Url, Params, AddAuthHeaders, ParseJson});
 request(Type, Url, Params, AddAuthHeaders, Callback, ParseJson) ->
     gen_server:cast(?SERVER, {request, Type, Url, Params, AddAuthHeaders, Callback, ParseJson}).
 
