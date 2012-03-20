@@ -6,9 +6,9 @@
    {vsn, "01"},
    {modules, []},
    {registered,[emashape_sup]},
-   {applications, [kernel, stdlib, mochiweb, ssl, ibrowse, ossp_uuid]},
+   {applications, [kernel, stdlib, mochiweb, ssl, ibrowse]},
    {agner, [         
-                     {requires, ["mochiweb", "ibrowse", "ossp_uuid"]}
+                     {requires, ["mochiweb", "ibrowse"]}
            ]},
    {mod, {emashape_app,[]}},
    {start_phases, []}]}.

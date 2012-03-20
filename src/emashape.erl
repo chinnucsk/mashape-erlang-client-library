@@ -199,7 +199,7 @@ request_(Type, Url, Headers, Body) ->
     ResultBody.
 
 auth_header(PublicKey, PrivateKey) ->
-    Uuid = ossp_uuid:make(v4, text), 
+    Uuid = list_to_binary(uuid:to_string(uuid:v4())),
     UuidHash = crypto:sha_mac(PrivateKey, Uuid),   
     HexBin = list_to_binary(string:to_lower(lists:flatten([[integer_to_list(N1,16), integer_to_list(N2,16)] 
                                            || << N1:4, N2:4 >> <= UuidHash]))),
