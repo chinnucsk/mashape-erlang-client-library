@@ -42,8 +42,7 @@ start_deps() ->
     application:start(mochiweb),
     application:start(public_key),
     application:start(ssl),
-    application:start(ibrowse),
-    application:start(ossp_uuid).
+    application:start(ibrowse).
 
 %%%===================================================================
 %%% Internal functions
