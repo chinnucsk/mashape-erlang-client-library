@@ -199,11 +199,10 @@ request_(Type, Url, Headers, Body) ->
     ResultBody.
 
 auth_header(PublicKey, PrivateKey) ->
-    Uuid = list_to_binary(uuid:to_string(uuid:v4())),
-    UuidHash = crypto:sha_mac(PrivateKey, Uuid),   
+    Hash = crypto:sha_mac(PrivateKey, PublicKey),   
     HexBin = list_to_binary(string:to_lower(lists:flatten([[integer_to_list(N1,16), integer_to_list(N2,16)] 
-                                           || << N1:4, N2:4 >> <= UuidHash]))),
-    { 'X-Mashape-Authorization', base64:encode_to_string(<<PublicKey/binary, ":", HexBin/binary, Uuid/binary>>) }.
+                                           || << N1:4, N2:4 >> <= Hash]))),
+    { 'Proxy-Authorization', base64:encode_to_string(<<PublicKey/binary, ":", HexBin/binary>>) }.
 
 client_headers() ->
     [{'X-Mashape-Language', "ERLANG"}, {'X-Mashape-Version', "V01"}].
