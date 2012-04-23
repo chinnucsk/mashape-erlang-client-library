@@ -205,7 +205,7 @@ auth_header(PublicKey, PrivateKey) ->
     { 'Proxy-Authorization', base64:encode_to_string(<<PublicKey/binary, ":", HexBin/binary>>) }.
 
 client_headers() ->
-    [{'X-Mashape-Language', "ERLANG"}, {'X-Mashape-Version', "V01"}].
+    [{'User-Agent', "mashape-erlang/1.0"}].
 
 proplist_to_qs(Params) ->   
     lists:flatten(lists:flatmap(fun({K, V}) ->
