@@ -202,7 +202,7 @@ auth_header(PublicKey, PrivateKey) ->
     Hash = crypto:sha_mac(PrivateKey, PublicKey),   
     HexBin = list_to_binary(string:to_lower(lists:flatten([[integer_to_list(N1,16), integer_to_list(N2,16)] 
                                            || << N1:4, N2:4 >> <= Hash]))),
-    { 'Proxy-Authorization', base64:encode_to_string(<<PublicKey/binary, ":", HexBin/binary>>) }.
+    { 'X-Mashape-Authorization', base64:encode_to_string(<<PublicKey/binary, ":", HexBin/binary>>) }.
 
 client_headers() ->
     [{'User-Agent', "mashape-erlang/1.0"}].
