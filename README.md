@@ -8,7 +8,7 @@ For questions or feedback visit [mashape.com](http://mashape.com/)
 Documentation
 -------------------
 
-For the documentation, please visit http://www.mashape.com/guide/consume/erlang
+For the documentation, please visit http://www.mashape.com/docs/consume/erlang
 
 Copyright
 ---------------
